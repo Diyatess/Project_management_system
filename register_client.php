@@ -1,5 +1,6 @@
 <?php
 include('conn.php');
+
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
@@ -17,8 +18,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else if (!preg_match("/^\d{10}$/", $contact)) {
         echo "Contact number must be exactly 10 digits.";
     } else {
-        // Hash the password (you should use more secure hashing techniques in production)
-        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        // Hash the password using MD5 (not recommended for production)
+        $hashed_password = md5($password);
 
         // SQL query to insert user into the database
         $sql = "INSERT INTO client (username, cname, contact, email, password )
@@ -26,21 +27,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($conn->query($sql) === TRUE) {
             echo "User registered successfully!";
+            header('Location: login_client.php');
         } else {
             echo "Error: " . $sql . "<br>" . $conn->error;
         }
     }
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        // Handle form data and database insertion here
-    
-        // Assuming successful registration, redirect to a success page
-        header('Location: login_client.php');
-        exit();
-    }
-
-    $conn->close();
 }
+
+$conn->close();
 ?>
+
 
 
 <!DOCTYPE html>
@@ -224,38 +220,35 @@ button{
             <a href="index.html" >Index Page</a>
         </form>
         <script>
-            function validateForm() {
-                // Basic form validation, you can customize this based on your requirements
-                const username = document.getElementById('username').value;
-                const cname = document.getElementById('cname').value;
-                const contact = document.getElementById('contact').value;
-                const projectname = document.getElementById('projectname').value;
-                const email = document.getElementById('email').value;
-                const expdate = document.getElementById('expdate').value;
-                const password = document.getElementById('password').value;
-                const role = document.getElementById('role').value;
-            
-                if (!username || !cname || !contact || !projectname || !email || !expdate || !password ) {
-                    alert('Please fill out all the fields.');
-                    return false;
-                }
+        function validateForm() {
+            const password = document.getElementById('password').value;
 
-                if (!/^\d{10}$/.test(contact)) {
-                    alert('Contact number must be exactly 10 digits.');
-                    return false;
-                }
-
-
-            
-                alert('Form submitted successfully!');
-                return true;
-
+            // Check password length
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters long.');
+                return false;
             }
-            function isPasswordSecure(password) {
-                // Password must have at least 8 characters, one uppercase, one lowercase, one number, and one special character
-                const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-                return passwordRegex.test(password);
+
+            // Check if password contains a number
+            if (!/\d/.test(password)) {
+                alert('Password must contain at least one number.');
+                return false;
             }
-            </script>
+
+            // Check if password contains a special character
+            if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+                alert('Password must contain at least one special character.');
+                return false;
+            }
+
+            // Check if password contains an uppercase letter
+            if (!/[A-Z]/.test(password)) {
+                alert('Password must contain at least one uppercase letter.');
+                return false;
+            }
+
+            return true;
+        }
+    </script>
 </body>
 </html>
