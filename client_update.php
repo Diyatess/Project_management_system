@@ -117,29 +117,38 @@ $conn->close();
         .edit-button:hover {
             background-color: #0056b3;
         }
+     
+
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="profile-container">
-            <h2>Edit Profile:</h2>
-            <form method="POST">
-                <div class="profile-details">
-                    <label for="cname">Name:</label>
-                    <input type="text" name="cname"  value="<?php echo $cname; ?>" placeholder="New Name">
-                </div>
-                <div class="profile-details">
-                    <label for="contact">Contact:</label>
-                    <input type="text" name="contact" value="<?php echo $contact; ?>" >
-                </div>
-                <div class="profile-details">
-                    <label for="username">Username:</label>
-                    <input type="text" name="username" value="<?php echo $username; ?>" >
-                </div>
-                <!-- Add more fields as needed -->
+<div class="container">
+    <div class="profile-container">
+        <h2>Edit Profile:</h2>
+        <form method="POST">
+            <div class="profile-details">
+                <label for="cname">Name:</label>
+                <input type="text" name="cname" value="<?php echo $cname; ?>" placeholder="New Name">
+            </div>
+            <div class="profile-details">
+                <label for="contact">Contact:</label>
+                <input type="text" name="contact" value="<?php echo $contact; ?>">
+            </div>
+            <div class="profile-details">
+                <label for="username">Username:</label>
+                <input type="text" name="username" value="<?php echo $username; ?>">
+            </div>
+            <!-- Add more fields as needed -->
+
+            <div class="button-container">
                 <button type="submit" class="edit-button">Save Changes</button>
-            </form>
-        </div>
+                <a href="client_dashboard.php?email=<?php echo $email; ?>" style="float: right;">
+                    <button class="edit-button" type="button">Back</button>
+                </a>
+            </div>
+        </form>
     </div>
+</div>
+
 </body>
 </html>
