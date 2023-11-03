@@ -2,8 +2,9 @@
 session_start();
 include('../conn.php'); 
 
-// Fetch client requests from the database
-$sql = "SELECT request_id, project_name, project_description, client_email FROM project_requests WHERE status = 'Pending'";
+// Fetch client requests and their associated client's contact from the database
+$sql = "SELECT pr.request_id, pr.project_name, pr.project_description, pr.client_email, c.contact FROM project_requests pr 
+JOIN client c ON pr.client_email = c.email WHERE pr.status = 'Pending';";
 $result = $conn->query($sql);
 
 $requests = [];
@@ -12,16 +13,6 @@ if ($result->num_rows > 0) {
         $requests[] = $row;
     }
 }
-
-
-// Simulated data (Replace with your team lead's information)
-$teamLead = [
-    'name' => 'John Doe',
-    'title' => 'Team Lead',
-    'email' => 'johndoe@gmail.com',
-    'phone' => '+91 7442 896 230',
-    /*'bio' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In in justo ac est varius viverra ut eu mi. Morbi sodales odio a odio venenatis.',*/
-];
 ?>
 
 <!DOCTYPE html>
@@ -31,44 +22,62 @@ $teamLead = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Team Lead Profile</title>
     <style>
- /* Style the action list */
-.action-list {
-    list-style: none;
-    padding: 0;
-}
+   /* Style the sidebar */
+   .sidebar {
+            height: 100%;
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: -250px;
+            background-color: #333;
+            overflow-x: hidden;
+            transition: 0.5s;
+            text-align: left;
+            padding-top: 60px;
+            color: #fff;
+        }
 
-/* Style the individual action items */
-.action-list li {
-    margin: 10px 0;
-}
+        .sidebar a {
+            padding: 8px 16px;
+            text-decoration: none;
+            font-size: 18px;
+            color: #fff;
+            display: block;
+            transition: 0.3s;
+            margin: 15px 0;
+        }
 
-/* Style the action links */
-.action-link {
-    text-decoration: none;
-    color: #fff;
-    background: linear-gradient(135deg, #0074D9, #00D2FC);
-    border: 2px solid #0074D9;
-    border-radius: 30px;
-    padding: 10px 15px;
-    display: inline-block;
-    transition: all 0.3s;
-    font-weight: bold;
-    font-size: 16px;
-}
+        .sidebar a:hover {
+            background-color: #00D2FC;
+            color: #fff;
+        }
 
-/* Hover effect */
-.action-link:hover {
-    background: linear-gradient(135deg, #00D2FC, #0074D9);
-    color: #fff;
-    transform: scale(1.05);
-}
-/* Style the action icons */
-.action-icon {
-    margin-right: 10px;
-    font-size: 20px;
-}
+        .openbtn {
+            font-size: 30px;
+            cursor: pointer;
+            position: fixed;
+            z-index: 1;
+            top: 10px;
+            left: 10px;
+            color: #fff;
+        }
 
+        .icon {
+            margin-right: 10px;
+            font-size: 20px;
+        }
 
+        /* Add a background color for the links */
+        .sidebar a {
+            background-color: #333;
+        }
+
+        /* On hover, the background color and text color change */
+        .sidebar a:hover {
+            background-color: #00D2FC;
+            color: #fff;
+        }
+/*main */
         body {
             font-family: Arial, sans-serif;
             background-color: #f5f5f5;
@@ -141,33 +150,14 @@ $teamLead = [
             font-weight: bold;
             color: #fff;
             font-size: 24px;
+            margin-left: 45px;
+            padding: 0px;
+
         }
         img {
             width: 39px;
             height: 39px;
         }
-    //*contact info */
-    .contact-info {
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    padding: 10px;
-    margin-top: 10px;
-}
-
-.contact-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.contact-label {
-    width: 80px;
-    font-weight: bold;
-}
-
-.contact-value {
-    flex: 1;
-}
 
     </style>
 </head>
@@ -178,82 +168,71 @@ $teamLead = [
         </a>
     <header>
         
-        <h1>Team Lead Profile</h1>
+        <h1>Team Lead page</h1>
     </header>
     <div class="container">
-        <div class="profile-info">
-            <div class="profile-picture"></div>
-            <div class="profile-details">
-                <h2><?php echo $teamLead['name']; ?></h2>
-                <p><?php echo $teamLead['title']; ?></p>
-            </div>
-        </div>
-        <!--<h2>About Me</h2>
-        <p><?php echo $teamLead['bio']; ?></p>-->
-        <h2>Contact Information</h2>
-<div class="contact-info">
-    <div class="contact-item">
-        <span class="contact-label">Email:</span>
-        <span class="contact-value"><?php echo $teamLead['email']; ?></span>
-    </div>
-    <div class="contact-item">
-        <span class="contact-label">Phone:</span>
-        <span class="contact-value"><?php echo $teamLead['phone']; ?></span>
-    </div>
-</div>
+       
 
-   <!--Actions-->     
-        <h2>Actions</h2>
-<div class="action-list">
-        <a href="edit_profile.php" class="action-link">
-            <span class="action-icon">&#9998;</span> Edit Profile
-        </a>&nbsp;&nbsp;
-        <a href="add_task.php" class="action-link">
-            <span class="action-icon">&#10010;</span> Add Task
-        </a>&nbsp;&nbsp;
-    
-        <a href="view_status.php" class="action-link">
-            <span class="action-icon">&#128196;</span> View Status
-        </a>&nbsp;&nbsp;
-        <a href="schedule_meeting.php" class="action-link">
-            <span class="action-icon">&#9201;</span> Schedule Meeting
-        </a>&nbsp;&nbsp;<br><br>
-    
-        <a href="monitor_progress.php" class="action-link">
-            <span class="action-icon">&#128221;</span> Monitor Daily Progress
-        </a>&nbsp;&nbsp;
-   
-        <a href="view_projects.php" class="action-link">
-            <span class="action-icon">&#128213;</span> View Approved/Denied Projects
-        </a>&nbsp;&nbsp;
-    </div>
 
 <!--client request-->
-        <h2>Client Requests</h2>
-<ul class="task-list">
-    <?php if (empty($requests)) : ?>
-        <li class="task-item">
-            <strong>No new requests at the moment.</strong>
-        </li>
-    <?php else : ?>
-        <?php foreach ($requests as $request) : ?>
+<h2>Client Requests</h2>
+    <ul class="task-list">
+        <?php if (empty($requests)) : ?>
             <li class="task-item">
-                <strong>Project Name:</strong> <?php echo $request['project_name']; ?><br>
-                <strong>Project Description:</strong> <?php echo $request['project_description']; ?><br>
-                <strong>Client Email:</strong> <?php echo $request['client_email']; ?><br>
-
-                <?php if (array_key_exists('request_id', $request)) : ?>
-                    <!-- Accept and Deny Buttons -->
-                    <a href="accept_request.php?request_id=<?php echo $request['request_id']; ?>">Accept</a>
-                    <a href="deny_request.php?request_id=<?php echo $request['request_id']; ?>">Deny</a>
-                <?php endif; ?>
+                <strong>No new requests at the moment.</strong>
             </li>
-        <?php endforeach; ?>
-    <?php endif; ?>
-</ul>
-
-
+        <?php else : ?>
+            <?php foreach ($requests as $request) : ?>
+                <li class="task-item">
+                    <strong>Project Name:</strong> <?php echo $request['project_name']; ?><br>
+                    <strong>Project Description:</strong> <?php echo $request['project_description']; ?><br>
+                    <strong>Client Email:</strong> <?php echo $request['client_email']; ?><br>
+                    <strong>Client Contact:</strong> <?php echo $request['contact']; ?><br>
+                    <a href="message.php?request_id=<?php echo $request['request_id']; ?>">Reply</a>
+                </li>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </ul>
+<!-- Sidebar -->
+<div id="mySidebar" class="sidebar">
+        <a href="edit_profile.php">
+            <span class="icon">&#9998;</span> Edit Profile
+        </a>
+        <a href="add_task.php">
+            <span class="icon">&#10010;</span> Add Task
+        </a>
+        <a href="view_status.php">
+            <span class="icon">&#128196;</span> View Status
+        </a>
+        <a href="schedule_meeting.php">
+            <span class="icon">&#9201;</span> Schedule Meeting
+        </a>
+        <a href="monitor_progress.php">
+            <span class="icon">&#128221;</span> Monitor Daily Progress
+        </a>
+        <a href="view_projects.php">
+            <span class="icon">&#128213;</span> View Approved/Denied Projects
+        </a>
+        <a href="add_project_details.php">
+            <span class="icon">&#10010;</span> Add Project
+        </a>
     </div>
+
+    <div class="openbtn" onclick="toggleSidebar()">&#9776;</div>
+
+    <script>
+        let sidebarOpen = false;
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById("mySidebar");
+            if (sidebarOpen) {
+                sidebar.style.left = "-250px";
+            } else {
+                sidebar.style.left = "0";
+            }
+            sidebarOpen = !sidebarOpen;
+        }
+    </script>
 </body>
 </html>
 
