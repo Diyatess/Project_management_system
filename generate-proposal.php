@@ -1,11 +1,9 @@
 <?php
-include('../conn.php');
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Process user input
     $projectTitle = $_POST["project_title"];
     $startDate = $_POST["start_date"];
     $endDate = $_POST["end_date"];
-    
 
     // Check if the input is not empty
     if (empty($projectTitle) || empty($startDate) || empty($endDate)) {
@@ -47,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $headers = array();
         $headers[] = 'Content-Type: application/json';
-        $headers[] = 'Authorization: Bearer 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';
+        $headers[] = 'Authorization: Bearer API KEY';// change API Key with the api key that we are creating
 
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
