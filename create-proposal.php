@@ -9,7 +9,17 @@ include('../conn.php'); // Include your database connection code
 if (isset($_GET['request_id'])) {
     $request_id = $_GET['request_id'];
 
+    // Update the status of the request to "Approved" in the database
+    $updateStatusSql = "UPDATE project_requests SET status = 'Approved' WHERE request_id = ?";
     
+    if ($stmt = $conn->prepare($updateStatusSql)) {
+        $stmt->bind_param("i", $request_id);
+        $stmt->execute();
+        $stmt->close();
+    } else {
+        // Handle the database connection error
+        echo "Error: " . $conn->error;
+    }
 
     // Fetch associated request details and client information from the database
     $sql = "SELECT project_name FROM project_requests WHERE request_id = ?";
@@ -52,3 +62,4 @@ if (isset($_GET['request_id'])) {
     </form>
 </body>
 </html>
+
