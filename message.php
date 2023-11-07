@@ -106,12 +106,121 @@ if (isset($_GET['request_id'])) {
         input[type="submit"]:hover {
             background-color: #0056a7;
         }
+        /* Style the sidebar */
+   .sidebar {
+            height: 100%;
+            width: 250px;
+            position: fixed;
+            top: 76px;
+            left: -250px;
+            background-color: #333;
+            overflow-x: hidden;
+            transition: 0.5s;
+            text-align: left;
+            padding-top: 60px;
+            color: #fff;
+        }
+
+        .sidebar a {
+            padding: 8px 16px;
+            text-decoration: none;
+            font-size: 18px;
+            color: #fff;
+            display: block;
+            transition: 0.3s;
+            margin: 15px 0;
+        }
+
+        .sidebar a:hover {
+            background-color: #00D2FC;
+            color: #fff;
+        }
+
+        .openbtn {
+            font-size: 30px;
+            cursor: pointer;
+            position: fixed;
+            z-index: 1;
+            top: 10px;
+            left: 10px;
+            color: #fff;
+        }
+        .icon {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        /* Add a background color for the links */
+        .sidebar a {
+            background-color: #333;
+        }
+
+        /* On hover, the background color and text color change */
+        .sidebar a:hover {
+            background-color: #00D2FC;
+            color: #fff;
+        }
+        .back-button {
+            background-color: #555;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+        }
+        .back-button:hover {
+            background-color: #777;
+        }
     </style>
+     <script>
+        let sidebarOpen = false;
+
+function toggleSidebar() {
+    const sidebar = document.getElementById("mySidebar");
+    if (sidebarOpen) {
+        sidebar.style.left = "-250px";
+    } else {
+        sidebar.style.left = "0";
+    }
+    sidebarOpen = !sidebarOpen;
+}
+    </script>
 </head>
 <body>
     <header>
+    <a href="tdashboard.php" class="back-button" style="float: right;">Back</a>
         <h1>Send a Message to Client</h1>
     </header>
+    <div id="mySidebar" class="sidebar">
+<a href="tdashboard.php">
+            <span class="dashboard-icon">📊</span> Dashboard
+        </a>
+        <!-- <a href="edit_profile.php">
+            <span class="icon">&#9998;</span> Edit Profile
+        </a>-->
+        <a href="add_task.php">
+            <span class="icon">&#10010;</span> Add Task
+        </a>
+        <a href="view_status.php">
+            <span class="icon">&#128196;</span> View Status
+        </a>
+        <a href="schedule_meeting.php">
+            <span class="icon">&#9201;</span> Schedule Meeting
+        </a>
+        <a href="monitor_progress.php">
+            <span class="icon">&#128221;</span> Monitor Daily Progress
+        </a>
+        <a href="view_projects.php">
+            <span class="icon">&#128213;</span> View Approved/Denied Projects
+        </a>
+       
+    </div>
+
+    <div class="openbtn" onclick="toggleSidebar()">&#9776;</div>
+
     <div class="container">
         <form action="send_message.php" method="post">
             <h2>Client Information</h2>
