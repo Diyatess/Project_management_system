@@ -2,6 +2,7 @@
 session_start();
 include('../conn.php'); 
 
+
 // Fetch client requests and their associated client's contact from the database
 $sql = "SELECT pr.request_id, pr.project_name, pr.project_description, pr.client_email, c.contact FROM project_requests pr 
 JOIN client c ON pr.client_email = c.email WHERE pr.status = 'Pending';";
@@ -27,7 +28,7 @@ if ($result->num_rows > 0) {
             height: 100%;
             width: 250px;
             position: fixed;
-            top: 0;
+            top: 76px;
             left: -250px;
             background-color: #333;
             overflow-x: hidden;
@@ -158,8 +159,54 @@ if ($result->num_rows > 0) {
             width: 39px;
             height: 39px;
         }
+        button{
+            block-size: 27px;
+            background: white;
+            border: black;
+            font-style: revert-layer;
+        }
 
     </style>
+    <script>
+        let sidebarOpen = false;
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById("mySidebar");
+            if (sidebarOpen) {
+                sidebar.style.left = "-250px";
+            } else {
+                sidebar.style.left = "0";
+            }
+            sidebarOpen = !sidebarOpen;
+        }
+        // Logout function
+        function logout() {
+            // Clear the session or perform any other necessary logout tasks
+            // Disable the ability to go back
+            history.pushState(null, null, window.location.href);
+            window.onpopstate = function (event) {
+                history.go(1);
+            };
+
+            // Redirect to the login page
+            window.location.replace("../login_client.php");
+        }
+
+    // Disable caching to prevent back button from showing the logged-in page
+    window.onload = function () {
+        window.history.forward();
+        document.onkeydown = function (e) {
+            if (e.keyCode === 9) {
+                return false;
+            }
+        };
+    }
+
+    // Redirect to the login page if the user tries to go back
+    window.addEventListener('popstate', function (event) {
+        window.location.replace("../login_client.php");
+    });
+    </script>
 </head>
 <body>
 <a class="navbar-brand" href="../index.php" style="float: left;">
@@ -167,7 +214,8 @@ if ($result->num_rows > 0) {
             <span> TaskMasters Hub</span>
         </a>
     <header>
-        
+        <!-- Logout button -->
+        <button onclick="logout()" type="button" style="float: right;">Logout</button>
         <h1>Team Lead page</h1>
     </header>
     <div class="container">
@@ -189,15 +237,16 @@ if ($result->num_rows > 0) {
                     <strong>Client Email:</strong> <?php echo $request['client_email']; ?><br>
                     <strong>Client Contact:</strong> <?php echo $request['contact']; ?><br>
                     <a href="message.php?request_id=<?php echo $request['request_id']; ?>">Reply</a>
+                    <a href="create-proposal.php?request_id=<?php echo $request['request_id']; ?>">Proposal</a>
                 </li>
             <?php endforeach; ?>
         <?php endif; ?>
     </ul>
 <!-- Sidebar -->
 <div id="mySidebar" class="sidebar">
-        <a href="edit_profile.php">
+        <!-- <a href="edit_profile.php">
             <span class="icon">&#9998;</span> Edit Profile
-        </a>
+        </a>-->
         <a href="add_task.php">
             <span class="icon">&#10010;</span> Add Task
         </a>
@@ -213,26 +262,10 @@ if ($result->num_rows > 0) {
         <a href="view_projects.php">
             <span class="icon">&#128213;</span> View Approved/Denied Projects
         </a>
-        <a href="add_project_details.php">
-            <span class="icon">&#10010;</span> Add Project
-        </a>
     </div>
 
     <div class="openbtn" onclick="toggleSidebar()">&#9776;</div>
 
-    <script>
-        let sidebarOpen = false;
-
-        function toggleSidebar() {
-            const sidebar = document.getElementById("mySidebar");
-            if (sidebarOpen) {
-                sidebar.style.left = "-250px";
-            } else {
-                sidebar.style.left = "0";
-            }
-            sidebarOpen = !sidebarOpen;
-        }
-    </script>
 </body>
 </html>
 
