@@ -169,10 +169,26 @@ if (isset($_GET['request_id'])) {
             background-color: #00D2FC;
             color: #fff;
         }
+        /*Send proposal link */
+        .send-proposal-link {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #333;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: background-color 0.3s;
+        float: right
+    }
+
+    .send-proposal-link:hover {
+        background-color: #777;
+    }
         
     </style>
-</head>
-    <script>
+     <script>
         let sidebarOpen = false;
 
 function toggleSidebar() {
@@ -184,15 +200,98 @@ function toggleSidebar() {
     }
     sidebarOpen = !sidebarOpen;
 }
- window.onload = function () {
-        window.history.forward();
-        document.onkeydown = function (e) {
-            if (e.keyCode === 9) {
-                return false;
-            }
-        };
+
+function isDate120DaysFromNow(date) {
+    var currentDate = new Date();
+    var oneHundredTwentyDaysFromNow = new Date(currentDate);
+    oneHundredTwentyDaysFromNow.setDate(oneHundredTwentyDaysFromNow.getDate() + 120);
+    return date >= oneHundredTwentyDaysFromNow && date >= currentDate;
+}
+
+function validateEndDate(startDate, endDate) {
+    var currentDate = new Date();
+    var minEndDate = new Date(currentDate);
+    minEndDate.setDate(minEndDate.getDate() + 120);
+
+    if (!startDate || !endDate) {
+        return true; // End date validation not required until both dates are provided
     }
-    </script>
+
+    if (endDate < startDate) {
+        return false; // End date cannot be before the start date
+    }
+
+    if (endDate < minEndDate) {
+        return false; // End date must be at least 120 days from the current date
+    }
+
+    return true;
+}
+
+
+function validateField(fieldId, errorMessage) {
+    var field = document.getElementById(fieldId);
+    var value = field.value.trim();
+    var messageElement = document.getElementById(fieldId + "_message");
+
+    if (fieldId === "project_title" || fieldId === "project_description" || fieldId === "modules") {
+        if (value === "") {
+            messageElement.textContent = errorMessage;
+            messageElement.style.display = "block";
+            return false;
+        } else {
+            messageElement.style.display = "none";
+            return true;
+        }
+    }
+
+    if (fieldId === "start_date") {
+        var startDate = new Date(value);
+        var isValid = validateStartDate(startDate);
+        if (isValid) {
+            messageElement.style.display = "none";
+        } else {
+            messageElement.textContent = "Start Date must be within one week from the current date.";
+            messageElement.style.display = "block";
+        }
+        return isValid;
+    }
+    function validateEndDate(startDate, endDate) {
+    var currentDate = new Date();
+    var minEndDate = new Date(currentDate);
+    minEndDate.setDate(minEndDate.getDate() + 121);
+
+    if (!startDate || !endDate) {
+        return true; // End date validation not required until both dates are provided
+    }
+
+    if (endDate < startDate) {
+        return false; // End date cannot be before the start date
+    }
+
+    if (endDate < minEndDate) {
+        return false; // End date must be at least 121 days from the current date
+    }
+
+    return true;
+}
+}
+
+function validateForm() {
+    var isValid = true;
+    isValid = validateField("project_title", "Project Title is required") && isValid;
+    isValid = validateField("project_description", "Project Description is required") && isValid;
+    isValid = validateField("modules", "Modules are required") && isValid;
+    isValid = validateField("start_date", "Start Date must be within one week from the current date") && isValid;
+    isValid = validateField("end_date", "End Date must be within 4 months from Start Date") && isValid; 
+    if (isValid) {
+        // Form is valid, proceed with submission
+        document.getElementById("yourForm").submit();
+    } 
+}
+</script>
+</head>
+   
 <body>
     <header>
         <a href="tdashboard.php" class="back-button" style="float: right;">Back</a>
@@ -228,24 +327,30 @@ function toggleSidebar() {
 
     <div class="container">
 
-        <form method="post"  action="generate-proposal.php">
-            <label for="project_title">Project Title:</label>
-            <input type="text" name="project_title" id="project_title" value="<?php echo $projectName; ?>" required>
-            <br>
-            <label for="start_date">Start Date:</label>
-            <input type="date" name="start_date" id="start_date" required>
-            <br>
-            <label for="end_date">End Date:</label>
-            <input type="date" name="end_date" id="end_date" required>
-            <br>
-            <label for="project_description">Project Description:</label>
-            <input type="text" name="project_description" id="project_description" value="<?php echo $projectDescription; ?>" required>
-            <br>
-            <label for="modules">Modules:</label>
-            <input type="text" name="modules" id="modules" required>
-            <br>
-            <input type="submit" value="Generate Proposal">
-        </form>
+    <form method="post" action="generate-proposal.php" onsubmit="return validateForm()">
+        <label for="project_title">Project Title:</label>
+        <input type="text" name="project_title" id="project_title" required value="<?php echo $projectName; ?>">
+        <p id="project_title_message" style="display:none; color:red;"></p>
+
+        <label for="project_description">Project Description:</label>
+        <input type="text" name="project_description" id="project_description"  value="<?php echo $projectDescription; ?>" required>
+        <p id="project_description_message" style="display:none; color:red;"></p>
+
+        <label for="modules">Modules:</label>
+        <input type="text" name="modules" id="modules" required>
+        <p id="modules_message" style="display:none; color:red;"></p>
+
+        <label for="start_date">Start Date:</label>
+        <input type="date" name="start_date" id="start_date" required>
+        <p id="start_date_message" style="display:none; color:red;"></p>
+
+        <label for="end_date">End Date:</label>
+        <input type="date" name="end_date" id="end_date" required>
+        <p id="end_date_message" style="display:none; color:red;"></p>
+
+        <input type="submit" value="Generate Proposal">
+    </form>
+        
     </div>
 </body>
 </html>
