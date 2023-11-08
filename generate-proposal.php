@@ -1,12 +1,16 @@
 <?php
+include('../conn.php'); 
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Process user input
     $projectTitle = $_POST["project_title"];
     $startDate = $_POST["start_date"];
     $endDate = $_POST["end_date"];
+    $projectDescription = $_POST["project_description"]; // Correct variable name
+    $modules = $_POST["modules"];
 
     // Check if the input is not empty
-    if (empty($projectTitle) || empty($startDate) || empty($endDate)) {
+    if (empty($projectTitle) || empty($startDate) || empty($endDate) || empty($projectDescription) || empty($modules)) {
         echo "Please fill in all the required fields.";
     } else {
         // Proceed with creating a software project proposal
@@ -21,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             "messages" => [
                 array(
                     "role" => "system",
-                    "content" => "create a software project proposal"
+                    "content" => "create a software project proposal with $modules, Objectives, Life Span, $projectDescription, scope, Timeline,features"
                 ),
                 array(
                     "role" => "user",
@@ -37,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 ),
             ],
             "temperature" => 0.7, // Adjust temperature for creativity
-            "max_tokens" => 1000, // Limit the proposal length
+            "max_tokens" => 1500, // Limit the proposal length
         );
         $postdata = json_encode($postdata);
 
@@ -45,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $headers = array();
         $headers[] = 'Content-Type: application/json';
-        $headers[] = 'Authorization: Bearer API KEY';// change API Key with the api key that we are creating
+        $headers[] = 'Authorization: Bearer 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'; // Replace with your OpenAI API key
 
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
@@ -57,36 +61,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $result = json_decode($result, true);
 
         // Extract the proposal content from the response
-        $proposalContent = $result['choices'][0]['message']['content'];
+       // Extract the proposal content from the response
+       $proposalContent = $result['choices'][0]['message']['content'];
+       
+       // Start a session (if not already started)
+       session_start();
 
-        // Create the PDF
-        require_once('../tcpdf/tcpdf.php'); // Adjust the path as needed
-        $pdf = new TCPDF();
-        $pdf->SetAutoPageBreak(true, 15);
-        $pdf->AddPage();
-        $pdf->SetFont('helvetica', '', 12);
-        $pdfContent = "
-        <h1>Software Project Proposal</h1>
-        <h2>Project Title: $projectTitle</h2>
-        <p>Start Date: $startDate</p>
-        <p>End Date: $endDate</p>
-        <div style='border: 1px solid #ccc; padding: 10px; border-radius: 5px; background-color: #f5f5f5; margin-top: 20px;'>
-            " . nl2br($proposalContent) . "
-        </div>
-        ";
-        $pdf->writeHTML($pdfContent, true, false, true, false, '');
+       // Store the proposal content in a session variable
+       $_SESSION['proposalContent'] = $proposalContent;
 
-        // Output the PDF for download
-        $pdf->Output('proposal.pdf', 'D');
-    }
+       // Redirect to the second page to display the content
+       header('Location: display_proposal.php');
+       exit;
+   }
 }
 ?>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Generated Proposal</title>
-</head>
-<body>
-    <h1>Generated Software Project Proposal</h1>
-</body>
-</html>
