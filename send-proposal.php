@@ -1,6 +1,6 @@
 <?php
 session_start();
-include('../conn.php'); 
+include('../conn.php');
 
 if (isset($_GET['request_id'])) {
     $request_id = $_GET['request_id'];
@@ -15,98 +15,107 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["request_id"])) {
 
     // Check if a proposal file is uploaded
     if (isset($_FILES["proposal_file"]) && $_FILES["proposal_file"]["error"] == 0) {
+        $allowed_extensions = ['pdf'];
         $file_name = $_FILES["proposal_file"]["name"];
         $file_tmp = $_FILES["proposal_file"]["tmp_name"];
+        $file_extension = pathinfo($file_name, PATHINFO_EXTENSION);
 
-        // Specify the directory to store proposal files
-        $file_destination = "../proposal/" . $file_name;
+        // Check if the file extension is allowed
+        if (in_array(strtolower($file_extension), $allowed_extensions)) {
+            // Specify the directory to store proposal files
+            $file_destination = "../proposal/" . $file_name;
 
-        // Move the uploaded file to the destination directory
-        if (move_uploaded_file($file_tmp, $file_destination)) {
-            
-            // Proposal file uploaded successfully, now store its details in the database
+            // Move the uploaded file to the destination directory
+            if (move_uploaded_file($file_tmp, $file_destination)) {
 
-            // Step 1: Retrieve the client_id by joining the project_requests and client tables
-            $sql_select_client_id = "SELECT c.id FROM project_requests pr
-                                    JOIN client c ON pr.client_email = c.email
-                                    WHERE pr.request_id = ?";
+                // Proposal file uploaded successfully, now store its details in the database
 
-            if ($stmt_client_id = $conn->prepare($sql_select_client_id)) {
-                $stmt_client_id->bind_param("i", $request_id);//it's binding an integer ("i") variable to the placeholder in the SQL query. 
-                $stmt_client_id->execute();
-                $stmt_client_id->bind_result($client_id);
-                $stmt_client_id->fetch();
-                $stmt_client_id->close();
+                // Step 1: Retrieve the client_id by joining the project_requests and client tables
+                $sql_select_client_id = "SELECT c.id FROM project_requests pr
+                                        JOIN client c ON pr.client_email = c.email
+                                        WHERE pr.request_id = ?";
 
-                // Step 2: Insert file details into the `client_attachments` table
-                $sql_insert = "INSERT INTO client_attachments (client_id, file_name, file_path, upload_time) VALUES (?, ?, ?, NOW())";
+                if ($stmt_client_id = $conn->prepare($sql_select_client_id)) {
+                    $stmt_client_id->bind_param("i", $request_id);
+                    $stmt_client_id->execute();
+                    $stmt_client_id->bind_result($client_id);
+                    $stmt_client_id->fetch();
+                    $stmt_client_id->close();
 
-                if ($stmt_insert = $conn->prepare($sql_insert)) {
-                    $stmt_insert->bind_param("iss", $client_id, $file_name, $file_destination);
+                    // Step 2: Insert file details into the `client_attachments` table
+                    $sql_insert = "INSERT INTO client_attachments (client_id, file_name, file_path, upload_time) VALUES (?, ?, ?, NOW())";
 
-                    if ($stmt_insert->execute()) {
-                        // Step 3: Update the status in the `project_requests` table to "Approved"
-                        $sql_update = "UPDATE project_requests SET status = 'Approved' WHERE request_id = ?";
-                    
-                        if ($stmt_update = $conn->prepare($sql_update)) {
-                            $stmt_update->bind_param("i", $request_id);
-                    
-                            if ($stmt_update->execute()) {
-                                // Check if the status is 'Approved' in the database
-                                $sql_check_status = "SELECT status FROM project_requests WHERE request_id = ?";
-                                if ($check_status = $conn->prepare($sql_check_status)) {
-                                    $check_status->bind_param("i", $request_id);
-                                    $check_status->execute();
-                                    $check_status->bind_result($status);
-                                    $check_status->fetch();
-                                    $check_status->close();
-                    
-                                    if ($status === 'Approved') {
-                                        // Status is 'Approved', proceed with success message
-                                        echo '<script>alert("File uploaded successfully!");</script>';
-                                        echo '<script>window.location.href = "tdashboard.php";</script>';
-                                        exit;
+                    if ($stmt_insert = $conn->prepare($sql_insert)) {
+                        $stmt_insert->bind_param("iss", $client_id, $file_name, $file_destination);
+
+                        if ($stmt_insert->execute()) {
+                            // Step 3: Update the status in the `project_requests` table to "Approved"
+                            $sql_update = "UPDATE project_requests SET status = 'Approved' WHERE request_id = ?";
+
+                            if ($stmt_update = $conn->prepare($sql_update)) {
+                                $stmt_update->bind_param("i", $request_id);
+
+                                if ($stmt_update->execute()) {
+                                    // Check if the status is 'Approved' in the database
+                                    $sql_check_status = "SELECT status FROM project_requests WHERE request_id = ?";
+                                    if ($check_status = $conn->prepare($sql_check_status)) {
+                                        $check_status->bind_param("i", $request_id);
+                                        $check_status->execute();
+                                        $check_status->bind_result($status);
+                                        $check_status->fetch();
+                                        $check_status->close();
+
+                                        if ($status === 'Approved') {
+                                            // Status is 'Approved', proceed with success message
+                                            echo '<script>alert("File uploaded successfully!");</script>';
+                                            echo '<script>window.location.href = "tdashboard.php";</script>';
+                                            exit;
+                                        } else {
+                                            // Handle the case where the status update did not work as expected
+                                            echo "Status was not updated as expected.";
+                                            echo $sql_update;
+                                        }
                                     } else {
-                                        // Handle the case where the status update did not work as expected
-                                        echo "Status was not updated as expected.";
-                                        echo $sql_update;
+                                        // Handle the error in checking the status
+                                        echo "Error checking status: " . $conn->error;
                                     }
                                 } else {
-                                    // Handle the error in checking the status
-                                    echo "Error checking status: " . $conn->error;
+                                    // Handle the error in updating the status
+                                    echo "Error updating status: " . $stmt_update->error;
                                 }
                             } else {
-                                // Handle the error in updating the status
-                                echo "Error updating status: " . $stmt_update->error;
+                                // Handle the database connection error for the update operation
+                                echo "Error: " . $conn->error;
                             }
                         } else {
-                            // Handle the database connection error for the update operation
-                            echo "Error: " . $conn->error;
+                            // Handle the error in inserting file details
+                            echo "Error inserting file details: " . $stmt_insert->error;
                         }
                     } else {
-                        // Handle the error in inserting file details
-                        echo "Error inserting file details: " . $stmt_insert->error;
+                        // Handle the database connection error for insert operation
+                        echo "Error: " . $conn->error;
                     }
                 } else {
-                    // Handle the database connection error for insert operation
+                    // Handle the error in retrieving the client_id
                     echo "Error: " . $conn->error;
                 }
             } else {
-                // Handle the error in retrieving the client_id
-                echo "Error: " . $conn->error;
+                // Handle file upload error
+                echo "Error uploading the proposal file.";
             }
         } else {
-            // Handle file upload error
-            echo "Error uploading the proposal file.";
+            // Alert the user that only PDF files are allowed
+            echo '<script>alert("Only PDF files are allowed.");</script>';
         }
     } else {
-        // Handle case where no file is uploaded
-        echo "Please upload a proposal file.";
+        // Alert the user to attach a PDF file
+        echo '<script>alert("Please attach a PDF file.");</script>';
     }
 
     $conn->close();
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
