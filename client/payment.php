@@ -1,106 +1,32 @@
 <?php
-session_start();
 include('../conn.php');
-
 if (isset($_GET['email'])) {
     $email = $_GET['email'];
 } else {
     echo "Email not provided in the URL.";
 }
-
-mysqli_close($conn);
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <title>Client Dashboard</title>
-    <link rel="stylesheet" href="st.css"> 
-       
-    <script>
-        let sidebarOpen = false;
-
-function toggleSidebar() {
-    const sidebar = document.getElementById("mySidebar");
-    if (sidebarOpen) {
-        sidebar.style.left = "-250px";
-    } else {
-        sidebar.style.left = "0";
-    }
-    sidebarOpen = !sidebarOpen;
-}
-    // Logout function
-    function logout() {
-            // Clear the session or perform any other necessary logout tasks
-            // Disable the ability to go back
-            history.pushState(null, null, window.location.href);
-            window.onpopstate = function (event) {
-                history.go(1);
-            };
-
-            // Redirect to the login page
-            window.location.replace("../login_client.php");
-        }
-
-    // Disable caching to prevent back button from showing the logged-in page
-    window.onload = function () {
-        window.history.forward();
-        document.onkeydown = function (e) {
-            if (e.keyCode === 9) {
-                return false;
-            }
-        };
-    }
-
-    // Redirect to the login page if the user tries to go back
-    window.addEventListener('popstate', function (event) {
-        window.location.replace("../login_client.php");
-    });
-
-     
-</script>
-
-    <style>
-    .red-dot {
-    position: relative;
-    text-decoration: none; /* Remove the underline */
-    color: #007BFF; /* Link text color */
-}
-
-.red-dot::before {
-    content: '\2022'; /* Unicode character for a bullet (•) */
-    position: absolute;
-    top: -5px; /* Adjust the vertical position of the dot */
-    left: 0;
-    color: red; /* Red color for the dot */
-}
-
-.red-dot:hover {
-    text-decoration: underline; /* Underline on hover */
-    color: #0056b3; /* Change link text color on hover */
-}
-body {
+    <title>Payment</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<style>
+    
+        body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             margin: 0;
             padding: 0;
         }
        
-        .proposal {
-            margin: 10px 0;
-        }
-        .proposal h2 {
-            font-size: 20px;
-            color: #333;
-        }
-        .status {
-            font-weight: bold;
-            color: green;
-        }
-        .download-link {
-            color: #0074d9;
-            text-decoration: none;
-        }
+       
     
         /* Style the sidebar */
    .sidebar {
@@ -172,9 +98,9 @@ body {
 
         }
         .dashboard-container {
-            display: flex;
-            justify-content: center;
+            margin:-7px;
             
+            padding-left: 388px;
         }
 
         .dashboard-box {
@@ -209,25 +135,19 @@ body {
             width: 39px;
             height: 39px;
         }
-        button{
-            block-size: 27px;
-            background: white;
-            border: black;
-            font-style: revert-layer;
-        }
-
     </style>
-</head>
 <body>
-    <header>
-    <button onclick="logout()" type="button" style="float: right;">Logout</button>
+<header>
+        <a class="navbar-brand" href="client_dashboard.php?email=<?php echo $email; ?>" style="float: right;">
+            <span>Back</span>
+        </a>
         <a class="navbar-brand" href="../index.php" style="float: left;">
                 <img src="../images/logo.png" alt="" />
                 <span> TaskMasters Hub</span>
             </a>
-            <h2 style="color: #fff;padding: 26px;">Client Dashboard</h2>
+            <h2 style="color: #fff;padding: 26px;">Payment</h2>
     </header>
-    <div id="mySidebar" class="sidebar">
+<div id="mySidebar" class="sidebar">
         <a href="client_dashboard.php?email=<?php echo $email; ?>">Dashboard</a>
         <a href="view_messages.php?email=<?php echo $email; ?>" class="red-dot">View Message</a>
         <a href="sugg.html">Suggestions/Add-ons</a>
@@ -239,20 +159,87 @@ body {
     </div>
 
     <div class="openbtn" onclick="toggleSidebar()">&#9776;</div>
-    
+
     <div id="container" class="dashboard-container">
     <div class="dashboard-box">
-        <h2>Welcome to Your Dashboard <?php echo $email; ?>!</h2>
-        <p>This is your client dashboard. You can view your project progress, provide suggestions, make payments, and update your profile here.</p>
+            <form id="paymentForm">
+                <div class="mb-3">
+                    <label for="amount" class="form-label">Payment Amount</label>
+                    <input type="text" class="form-control" id="amount" name="amount" required>
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <input type="text" class="form-control" id="description" name="description" required>
+                </div>
 
-        <h3>Project Progress</h3>
-        <p>Project progress: XX%</p>
-        <div class="message-container" id="messageContainer">
-            <a href="view_proposal.php?email=<?php echo $email; ?>" class="red-dot">View proposal</a>
-            <!--<p><a href="view_messages.php?email=<?php echo $email; ?>" class="red-dot">View Message</a></p>-->
+                <?php
+                // Get the client email from the URL
+                $clientEmail = $_GET['email'];
+                ?>
+
+                <input type="hidden" id="clientEmail" value="<?php echo $clientEmail; ?>">
+
+                <button type="button" class="btn btn-primary buynow">Pay Now</button>
+            </form>
         </div>
     </div>
-</div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    $(".buynow").click(function () {
+        var amount = $("#amount").val();
+        var description = $("#description").val();
+        var clientEmail = $("#clientEmail").val();
+
+        var options = {
+            key: 'rzp_test_EwyzGhRmw2NUjI', // Replace with your actual Razorpay key
+            amount: amount * 100,
+            currency: 'INR',
+            name: 'TaskMaster Hub',
+            description: description,
+            handler: function (response) {
+                var paymentid = response.razorpay_payment_id;
+
+                $.ajax({
+                    url: "payment-process.php?email=" + clientEmail, // Fix: Use "email" as the parameter
+                    type: "POST",
+                    data: { payment_id: paymentid, amount: amount, description: description },
+                    success: function (finalresponse) {
+                        if (finalresponse == 'done') {
+                            window.location.href = "success.php";
+                        } else {
+                            alert('Please check console.log to find error');
+                            console.log(finalresponse);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.log("Error:", xhr.responseText);
+                    }
+                });
+            },
+            theme: {
+                color: "#3399cc"
+            }
+        };
+
+        var rzp1 = new Razorpay(options);
+        rzp1.open();
+    });
+
+    let sidebarOpen = false;
+
+function toggleSidebar() {
+    const sidebar = document.getElementById("mySidebar");
+    if (sidebarOpen) {
+        sidebar.style.left = "-250px";
+    } else {
+        sidebar.style.left = "0";
+    }
+    sidebarOpen = !sidebarOpen;
+}
+
+</script>
 
 </body>
 

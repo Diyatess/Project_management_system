@@ -15,7 +15,6 @@ if (isset($_GET['request_id'])) {
             FROM project_requests pr
             JOIN client c ON pr.client_email = c.email
             WHERE pr.request_id = ?";
-
     if ($stmt = $conn->prepare($sql)) {
         $stmt->bind_param("i", $request_id);
         $stmt->execute();
