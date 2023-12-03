@@ -149,6 +149,35 @@ if ($result->num_rows > 0) {
             font-style: revert-layer;
         }
 
+        .action-button {
+        display: inline-block;
+        padding: 10px 10px;
+        margin: 5px;
+        text-decoration: none;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        font-size: 12px;
+        transition: background-color 0.3s ease;
+    }
+
+    .reply-button {
+        background-color: #4CAF50; /* Green */
+    }
+
+    .proposal-button {
+        background-color: #008CBA; /* Blue */
+    }
+
+    .send-proposal-button {
+        background-color: #f44336; /* Red */
+    }
+
+    .action-button:hover {
+        background-color: #555;
+    }
+
     </style>
     <script>
         let sidebarOpen = false;
@@ -217,9 +246,9 @@ if ($result->num_rows > 0) {
                     <strong>Project Description:</strong> <?php echo $request['project_description']; ?><br>
                     <strong>Client Email:</strong> <?php echo $request['client_email']; ?><br>
                     <strong>Client Contact:</strong> <?php echo $request['contact']; ?><br>
-                    <a href="message.php?request_id=<?php echo $request['request_id']; ?>">Reply</a>
-                    <a href="create-proposal.php?request_id=<?php echo $request['request_id']; ?>">Proposal</a>
-                    <a href="send-proposal.php?request_id=<?php echo $request['request_id']; ?>">Send Proposal</a>
+                    <a href="message.php?request_id=<?php echo $request['request_id']; ?>" class="action-button reply-button">Reply</a>
+                    <a href="create-proposal.php?request_id=<?php echo $request['request_id']; ?>" class="action-button proposal-button">Proposal</a>
+                    <a href="send-proposal.php?request_id=<?php echo $request['request_id']; ?>" class="action-button send-proposal-button">Send Proposal</a>
                 </li>
             <?php endforeach; ?>
         <?php endif; ?>

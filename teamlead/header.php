@@ -7,6 +7,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Team Lead Profile</title>
     <style>
+   body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        /* Add or modify styles as needed */
+        .container {
+            margin:33px;
+            justify-content: space-between;
+            padding: 20px;
+        }
+        .main-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar {
+            height: 100%;
+            width: 250px;
+            position: fixed;
+            top: 76px;
+            left: 0;
+            background-color: #333;
+            overflow-x: hidden;
+            transition: 0.5s;
+            text-align: left;
+            padding-top: 60px;
+            color: #fff;
+        }
+
+        .sidebar a {
+            padding: 8px 16px;
+            text-decoration: none;
+            font-size: 18px;
+            color: #fff;
+            display: block;
+            transition: 0.3s;
+            margin: 15px 0;
+        }
+
+        .sidebar a:hover {
+            background-color: #00D2FC;
+            color: #fff;
+        }
+
+        h1 {
+            font-size: 32px;
+            color: #fff;
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
         /* Style the sidebar */
         .sidebar {
             height: 100%;
@@ -44,7 +126,7 @@
             z-index: 1;
             top: 10px;
             left: 10px;
-            color: #fff;
+            color: #00d2fc;
         }
 
         .icon {
@@ -63,63 +145,20 @@
             color: #fff;
         }
 
-        /* main */
-        
-        header {
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            padding: 24px;
-            margin: -8px;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 8px auto;
-            padding: 20px;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            font-size: 32px;
-            color: #fff;
-            text-align: center; /* Center the heading text */
-        }
-        
-        .task-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .task-item {
-            margin: 20px 0;
-            border: 1px solid #ddd;
-            padding: 10px;
-            border-radius: 5px;
-            background-color: #fff;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .task-item strong {
-            color: #0074D9;
-        }
-
         a {
             text-decoration: none;
             color: #0074D9;
         }
 
         a.navbar-brand {
-            color: black;  /* Set the text color to black */
-            text-decoration: none;  /* Remove the underline */
+            color: black; /* Set the text color to black */
+            text-decoration: none; /* Remove the underline */
             font-weight: bold;
             color: #fff;
             font-size: 24px;
             margin-left: 45px;
             padding: 0px;
+
         }
 
         img {
@@ -127,25 +166,14 @@
             height: 39px;
         }
 
-        button {
-            block-size: 27px;
-            background: white;
-            border: black;
-            font-style: revert-layer;
+        header {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 24px;
         }
     </style>
     <script>
-        let sidebarOpen = false;
-
-        function toggleSidebar() {
-            const sidebar = document.getElementById("mySidebar");
-            if (sidebarOpen) {
-                sidebar.style.left = "-250px";
-            } else {
-                sidebar.style.left = "0";
-            }
-            sidebarOpen = !sidebarOpen;
-        }
 
         // Logout function
         function logout() {
@@ -181,6 +209,7 @@
         <img src="../images/logo.png" alt="" />
         <span> TaskMasters Hub</span>
     </a>
+    
     
 </body>
 </html>

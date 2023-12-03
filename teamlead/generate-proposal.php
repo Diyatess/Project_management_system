@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             "messages" => [
                 array(
                     "role" => "system",
-                    "content" => "create a software project proposal with $modules, Objectives, $projectDescription,Deliverables, scope,features, Risks and Mitigation Strategies"
+                    "content" => "create a software project proposal with $modules, Objectives, $projectDescription,Deliverables, scope,features, Risks and Mitigation Strategies functional point: external input,external output,external inquiries,task divistions"
                 ),
                 array(
                     "role" => "user",
@@ -41,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $headers = array();
         $headers[] = 'Content-Type: application/json';
-        $headers[] = 'Authorization: Bearer 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'; // Replace with your OpenAI API key
+        $headers[] = 'Authorization: Bearer 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'; // Replace with your OpenAI API key
 
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 

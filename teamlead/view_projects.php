@@ -140,6 +140,22 @@ if ($result->num_rows > 0) {
             width: 39px;
             height: 39px;
         }
+        .action-button {
+        display: inline-block;
+        padding: 10px 10px;
+        margin: 5px;
+        text-decoration: none;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        font-size: 12px;
+        transition: background-color 0.3s ease;
+    }
+
+    .reply-button {
+        background-color: #4CAF50; /* Green */
+    }
     </style>
 </head>
 <body>
@@ -164,6 +180,8 @@ if ($result->num_rows > 0) {
                 <strong>Project Status:</strong> <?php echo $project['project_status']; ?><br>
                 <strong>Client Name:</strong> <?php echo $project['client_name']; ?><br>
                 <strong>Client Email:</strong> <?php echo $project['client_email']; ?><br>
+                <a href="message.php?request_id=<?php echo $project['project_client_email']; ?>" class="action-button reply-button">Reply</a>
+
             </li>
         <?php endforeach; ?>
     </ul>

@@ -261,6 +261,9 @@ function validateForm() {
         <a href="view_projects.php">
             <span class="icon">&#128213;</span> View Approved/Denied Projects
         </a>
+        <a href="functional.php">
+            <span class="icon">📏</span> Calculate Functional Point
+        </a>
        
     </div>
 

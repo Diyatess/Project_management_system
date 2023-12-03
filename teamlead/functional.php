@@ -77,7 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $headers = array();
         $headers[] = 'Content-Type: application/json';
-        $headers[] = 'Authorization: Bearer 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'; // Replace with your OpenAI API key
+        $headers[] = 'Authorization: Bearer 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'; // Replace with your OpenAI API key
 
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
@@ -280,20 +280,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             text-align: center;
             padding: 24px;
         }
-    </style>
-    <script>
-        let sidebarOpen = false;
-
-        function toggleSidebar() {
-            const sidebar = document.getElementById("mySidebar");
-            if (sidebarOpen) {
-                sidebar.style.left = "-250px";
-            } else {
-                sidebar.style.left = "0";
-            }
-            sidebarOpen = !sidebarOpen;
+        .error-message {
+            color: red;
+            margin-top: 5px;
         }
-    </script>
+    </style>
+ 
 </head>
 
 <body>
@@ -301,7 +293,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <img src="../images/logo.png" alt="" />
         <span> TaskMasters Hub</span>
     </a>
-    <header>
+    <header>  
     <div class="openbtn" onclick="toggleSidebar()">&#9776;</div>
         <button onclick="window.location.href='tdashboard.php'" type="button" style="float: right;">Back</button>
         <h1>Calculate Total Months</h1>
@@ -327,44 +319,95 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <span class="icon">📏</span> Calculate Functional Point
         </a>
     </div>
-
-    
-
     <div class="main-content">
-    <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
+    <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post" onsubmit="return validateForm()">
     <label for="externalInputs">External Inputs (comma-separated):</label>
-    <input type="text" name="externalInputs" placeholder="e.g., input1, input2" required>
+    <input type="text" name="externalInputs" id="externalInputs" placeholder="e.g., input1, input2" required>
+    <div id="externalInputsError" class="error-message"></div>
 
     <label for="externalOutputs">External Outputs (comma-separated):</label>
-    <input type="text" name="externalOutputs" placeholder="e.g., output1, output2" required>
+    <input type="text" name="externalOutputs" id="externalOutputs" placeholder="e.g., output1, output2" required>
+    <div id="externalOutputsError" class="error-message"></div>
 
     <label for="externalInquiries">External Inquiries (comma-separated):</label>
-    <input type="text" name="externalInquiries" placeholder="e.g., inquiry1, inquiry2" required>
+    <input type="text" name="externalInquiries" id="externalInquiries" placeholder="e.g., inquiry1, inquiry2" required>
+    <div id="externalInquiriesError" class="error-message"></div>
 
     <label for="teamSize">Team Size:</label>
-    <input type="number" name="teamSize" placeholder="e.g., 3" required>
+    <input type="number" name="teamSize" id="teamSize" placeholder="e.g., 3" required>
+    <div id="teamSizeError" class="error-message"></div>
 
     <label for="averageProductivity">Average Productivity:</label>
-    <input type="number" step="0.01" name="averageProductivity" placeholder="e.g., 0.08" required>
+    <input type="number" step="0.01" name="averageProductivity" id="averageProductivity" placeholder="e.g., 0.08" required>
+    <div id="averageProductivityError" class="error-message"></div>
 
     <label for="hourlyRate">Hourly Rate ($):</label>
-    <input type="number" step="0.01" name="hourlyRate" placeholder="e.g., 100.00" required>
+    <input type="number" step="0.01" name="hourlyRate" id="hourlyRate" placeholder="e.g., 100.00" required>
+    <div id="hourlyRateError" class="error-message"></div>
 
-    <!--<label for="effort">Estimated Effort in hours (1 or above):</label>
-    <input type="number" step="0.01" name="effort" placeholder="e.g., 1.2" required>-->
+    <button type="submit">Calculate</button>
+</form>
 
-        <button type="submit">Calculate</button>
-        </form>
+<?php
+// Display the result if available
+if (isset($totalMonths) && isset($totalCostINR) && isset($functionalPoints)) {
+    echo "<h2>Calculation Result</h2>";
+    echo "<p>Total Months: " . round($totalMonths) . "</p>"; // Round to the nearest integer
+    echo "<p>Total Cost: ₹" . number_format($totalCostINR, 2) . "</p>";
+}
+?>
 
-        <?php
-        // Display the result if available
-        if (isset($totalMonths) && isset($totalCostINR) && isset($functionalPoints)) {
-            echo "<h2>Calculation Result</h2>";
-            echo "<p>Total Months: " . round($totalMonths) . "</p>"; // Round to the nearest integer
-            echo "<p>Total Cost: ₹" . number_format($totalCostINR, 2) . "</p>";
+<script>
+    let sidebarOpen = false;
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById("mySidebar");
+        if (sidebarOpen) {
+            sidebar.style.left = "-250px";
+        } else {
+            sidebar.style.left = "0";
         }
-        ?>
-    </div>
-</body>
+        sidebarOpen = !sidebarOpen;
+    }
 
+    function validateForm() {
+        const externalInputs = document.getElementById("externalInputs").value;
+        const externalOutputs = document.getElementById("externalOutputs").value;
+        const externalInquiries = document.getElementById("externalInquiries").value;
+
+        const externalInputsError = document.getElementById("externalInputsError");
+        const externalOutputsError = document.getElementById("externalOutputsError");
+        const externalInquiriesError = document.getElementById("externalInquiriesError");
+
+        const isWord = /^[A-Za-z\s,]+$/;
+
+        // Validate External Inputs
+        if (!isWord.test(externalInputs)) {
+            externalInputsError.innerHTML = "Please enter valid words separated by commas";
+            return false;
+        } else {
+            externalInputsError.innerHTML = "";
+        }
+
+        // Validate External Outputs
+        if (!isWord.test(externalOutputs)) {
+            externalOutputsError.innerHTML = "Please enter valid words separated by commas";
+            return false;
+        } else {
+            externalOutputsError.innerHTML = "";
+        }
+
+        // Validate External Inquiries
+        if (!isWord.test(externalInquiries)) {
+            externalInquiriesError.innerHTML = "Please enter valid words separated by commas";
+            return false;
+        } else {
+            externalInquiriesError.innerHTML = "";
+        }
+
+        return true;
+    }
+</script>
+
+</body>
 </html>

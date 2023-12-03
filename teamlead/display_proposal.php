@@ -18,5 +18,4 @@ if (isset($_SESSION['proposalContent'])) {
     alert("No proposal content found.");
 }
 
-
 ?>
